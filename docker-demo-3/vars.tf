@@ -1,5 +1,5 @@
 variable "AWS_REGION" {
-  default = "eu-west-1"
+  default = "eu-central-1"
 }
 
 variable "PATH_TO_PRIVATE_KEY" {
@@ -20,6 +20,7 @@ variable "ECS_AMIS" {
     us-east-1 = "ami-1924770e"
     us-west-2 = "ami-56ed4936"
     eu-west-1 = "ami-c8337dbb"
+	eu-central-1 = "ami-0f667aa009598db39"
   }
 }
 
@@ -31,6 +32,7 @@ variable "AMIS" {
     us-east-1 = "ami-01b996646377b6619"
     us-west-2 = "ami-0637e7dc7fcc9a2d9"
     eu-west-1 = "ami-081ff4b9aa4e81a08"
+	eu-central-1 = "ami-05b308c240ae70bb6"
   }
 }
 

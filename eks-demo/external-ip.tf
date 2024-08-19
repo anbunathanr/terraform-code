@@ -1,8 +1,7 @@
 data "http" "workstation-external-ip" {
-  url = "http://ipv4.icanhazip.com"
+  url = "http://checkip.amazonaws.com"
 }
 
 locals {
-  workstation-external-cidr = "${chomp(data.http.workstation-external-ip.response_body)}/32"
+  workstation-external-cidr = "${chomp(data.http.workstation-external-ip.body)}/32"
 }
-

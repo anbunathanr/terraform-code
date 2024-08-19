@@ -1,0 +1,473 @@
+{
+  "version": 4,
+  "terraform_version": "0.12.12",
+  "serial": 28,
+  "lineage": "0af2a5e6-3a25-d12e-c6d7-8bba8b46bb1b",
+  "outputs": {
+    "myapp-repository-URL": {
+      "value": "208409385559.dkr.ecr.eu-central-1.amazonaws.com/myapp",
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "mode": "data",
+      "type": "cloudinit_config",
+      "name": "cloudinit-jenkins",
+      "provider": "provider.cloudinit",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "base64_encode": false,
+            "boundary": "MIMEBOUNDARY",
+            "gzip": false,
+            "id": "1621753126",
+            "part": [
+              {
+                "content": "#!/bin/bash\n\n# volume setup\nvgchange -ay\n\nDEVICE_FS=`blkid -o value -s TYPE /dev/xvdh`\nif [ \"`echo -n $DEVICE_FS`\" == \"\" ] ; then \n  # wait for the device to be attached\n  DEVICENAME=`echo \"/dev/xvdh\" | awk -F '/' '{print $3}'`\n  DEVICEEXISTS=''\n  while [[ -z $DEVICEEXISTS ]]; do\n    echo \"checking $DEVICENAME\"\n    DEVICEEXISTS=`lsblk |grep \"$DEVICENAME\" |wc -l`\n    if [[ $DEVICEEXISTS != \"1\" ]]; then\n      sleep 15\n    fi\n  done\n  pvcreate /dev/xvdh\n  vgcreate data /dev/xvdh\n  lvcreate --name volume1 -l 100%FREE data\n  mkfs.ext4 /dev/data/volume1\nfi\nmkdir -p /var/lib/jenkins\necho '/dev/data/volume1 /var/lib/jenkins ext4 defaults 0 0' \u003e\u003e /etc/fstab\nmount /var/lib/jenkins\n\n# install default-jre (needed for ubuntu 18.04)\napt-get update\napt-get install -y default-jre\n\n# install jenkins and docker\ncurl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo tee \\\n   /usr/share/keyrings/jenkins-keyring.asc \u003e /dev/null\necho deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \\\n https://pkg.jenkins.io/debian-stable binary/ | sudo tee \\\n /etc/apt/sources.list.d/jenkins.list \u003e /dev/null\napt-get update\napt-get install -y jenkins=2.319.2 unzip docker.io\n\n# enable docker and add perms\nusermod -G docker jenkins\nsystemctl enable docker\nservice docker start\nservice jenkins restart\n\n# install pip\nwget -q https://bootstrap.pypa.io/get-pip.py\npython get-pip.py\npython3 get-pip.py\nrm -f get-pip.py\n# install awscli\npip install awscli\n\n# install terraform\nTERRAFORM_VERSION=\"0.12.18\"\nwget -q https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip \\\n\u0026\u0026 unzip -o terraform_${TERRAFORM_VERSION}_linux_amd64.zip -d /usr/local/bin \\\n\u0026\u0026 rm terraform_${TERRAFORM_VERSION}_linux_amd64.zip\n\n# clean up\napt-get clean\nrm terraform_0.12.18_linux_amd64.zip\n",
+                "content_type": "text/x-shellscript",
+                "filename": "",
+                "merge_type": ""
+              }
+            ],
+            "rendered": "Content-Type: multipart/mixed; boundary=\"MIMEBOUNDARY\"\nMIME-Version: 1.0\r\n\r\n--MIMEBOUNDARY\r\nContent-Transfer-Encoding: 7bit\r\nContent-Type: text/x-shellscript\r\nMime-Version: 1.0\r\n\r\n#!/bin/bash\n\n# volume setup\nvgchange -ay\n\nDEVICE_FS=`blkid -o value -s TYPE /dev/xvdh`\nif [ \"`echo -n $DEVICE_FS`\" == \"\" ] ; then \n  # wait for the device to be attached\n  DEVICENAME=`echo \"/dev/xvdh\" | awk -F '/' '{print $3}'`\n  DEVICEEXISTS=''\n  while [[ -z $DEVICEEXISTS ]]; do\n    echo \"checking $DEVICENAME\"\n    DEVICEEXISTS=`lsblk |grep \"$DEVICENAME\" |wc -l`\n    if [[ $DEVICEEXISTS != \"1\" ]]; then\n      sleep 15\n    fi\n  done\n  pvcreate /dev/xvdh\n  vgcreate data /dev/xvdh\n  lvcreate --name volume1 -l 100%FREE data\n  mkfs.ext4 /dev/data/volume1\nfi\nmkdir -p /var/lib/jenkins\necho '/dev/data/volume1 /var/lib/jenkins ext4 defaults 0 0' \u003e\u003e /etc/fstab\nmount /var/lib/jenkins\n\n# install default-jre (needed for ubuntu 18.04)\napt-get update\napt-get install -y default-jre\n\n# install jenkins and docker\ncurl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo tee \\\n   /usr/share/keyrings/jenkins-keyring.asc \u003e /dev/null\necho deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \\\n https://pkg.jenkins.io/debian-stable binary/ | sudo tee \\\n /etc/apt/sources.list.d/jenkins.list \u003e /dev/null\napt-get update\napt-get install -y jenkins=2.319.2 unzip docker.io\n\n# enable docker and add perms\nusermod -G docker jenkins\nsystemctl enable docker\nservice docker start\nservice jenkins restart\n\n# install pip\nwget -q https://bootstrap.pypa.io/get-pip.py\npython get-pip.py\npython3 get-pip.py\nrm -f get-pip.py\n# install awscli\npip install awscli\n\n# install terraform\nTERRAFORM_VERSION=\"0.12.18\"\nwget -q https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip \\\n\u0026\u0026 unzip -o terraform_${TERRAFORM_VERSION}_linux_amd64.zip -d /usr/local/bin \\\n\u0026\u0026 rm terraform_${TERRAFORM_VERSION}_linux_amd64.zip\n\n# clean up\napt-get clean\nrm terraform_0.12.18_linux_amd64.zip\n\r\n--MIMEBOUNDARY--\r\n"
+          }
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_autoscaling_group",
+      "name": "ecs-example-autoscaling",
+      "provider": "provider.aws",
+      "instances": []
+    },
+    {
+      "mode": "managed",
+      "type": "aws_ebs_volume",
+      "name": "jenkins-data",
+      "provider": "provider.aws",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:ec2:eu-central-1:208409385559:volume/vol-0b0b00ca63f3cf2e1",
+            "availability_zone": "eu-central-1a",
+            "encrypted": false,
+            "id": "vol-0b0b00ca63f3cf2e1",
+            "iops": 100,
+            "kms_key_id": "",
+            "multi_attach_enabled": false,
+            "outpost_arn": "",
+            "size": 20,
+            "snapshot_id": "",
+            "tags": {
+              "Name": "jenkins-data"
+            },
+            "throughput": 0,
+            "type": "gp2"
+          },
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_ecr_repository",
+      "name": "myapp",
+      "provider": "provider.aws",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:ecr:eu-central-1:208409385559:repository/myapp",
+            "encryption_configuration": [
+              {
+                "encryption_type": "AES256",
+                "kms_key": ""
+              }
+            ],
+            "id": "myapp",
+            "image_scanning_configuration": [
+              {
+                "scan_on_push": false
+              }
+            ],
+            "image_tag_mutability": "MUTABLE",
+            "name": "myapp",
+            "registry_id": "208409385559",
+            "repository_url": "208409385559.dkr.ecr.eu-central-1.amazonaws.com/myapp",
+            "tags": {},
+            "timeouts": null
+          },
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiZGVsZXRlIjoxMjAwMDAwMDAwMDAwfX0="
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_ecs_cluster",
+      "name": "example-cluster",
+      "provider": "provider.aws",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:ecs:eu-central-1:208409385559:cluster/example-cluster",
+            "capacity_providers": [],
+            "default_capacity_provider_strategy": [],
+            "id": "arn:aws:ecs:eu-central-1:208409385559:cluster/example-cluster",
+            "name": "example-cluster",
+            "setting": [],
+            "tags": {}
+          },
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_ecs_service",
+      "name": "myapp-service",
+      "each": "list",
+      "provider": "provider.aws",
+      "instances": []
+    },
+    {
+      "mode": "managed",
+      "type": "aws_ecs_task_definition",
+      "name": "myapp-task-definition",
+      "provider": "provider.aws",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "arn": "arn:aws:ecs:eu-central-1:208409385559:task-definition/myapp:2",
+            "container_definitions": "[{\"command\":[\"npm\",\"start\"],\"cpu\":256,\"environment\":[],\"essential\":true,\"image\":\"208409385559.dkr.ecr.eu-central-1.amazonaws.com/myapp:0\",\"memory\":256,\"mountPoints\":[],\"name\":\"myapp\",\"portMappings\":[{\"containerPort\":3000,\"hostPort\":3000,\"protocol\":\"tcp\"}],\"systemControls\":[],\"volumesFrom\":[],\"workingDirectory\":\"/app\"}]",
+            "cpu": "",
+            "execution_role_arn": "",
+            "family": "myapp",
+            "id": "myapp",
+            "inference_accelerator": [],
+            "ipc_mode": "",
+            "memory": "",
+            "network_mode": "",
+            "pid_mode": "",
+            "placement_constraints": [],
+            "proxy_configuration": [],
+            "requires_compatibilities": [],
+            "revision": 2,
+            "tags": {},
+            "task_role_arn": "",
+            "volume": []
+          },
+          "private": "eyJzY2hlbWFfdmVyc2lvbiI6IjEifQ==",
+          "depends_on": [
+            "aws_ecr_repository.myapp"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_elb",
+      "name": "myapp-elb",
+      "provider": "provider.aws",
+      "instances": []
+    },
+    {
+      "mode": "managed",
+      "type": "aws_iam_instance_profile",
+      "name": "ecs-ec2-role",
+      "provider": "provider.aws",
+      "instances": [
+        {
+          "status": "tainted",
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:iam::208409385559:instance-profile/ecs-ec2-role",
+            "create_date": "2024-08-19T12:02:50Z",
+            "id": "ecs-ec2-role",
+            "name": "ecs-ec2-role",
+            "name_prefix": null,
+            "path": "/",
+            "role": "ecs-ec2-role",
+            "tags": {},
+            "unique_id": "AIPATBBRK3JLX5ILZZ5CP"
+          },
+          "private": "bnVsbA==",
+          "depends_on": [
+            "aws_iam_role.ecs-ec2-role"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_iam_policy_attachment",
+      "name": "ecs-service-attach1",
+      "provider": "provider.aws",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "groups": [],
+            "id": "ecs-service-attach1",
+            "name": "ecs-service-attach1",
+            "policy_arn": "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceRole",
+            "roles": [
+              "ecs-service-role"
+            ],
+            "users": []
+          },
+          "private": "bnVsbA==",
+          "depends_on": [
+            "aws_iam_role.ecs-service-role"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_iam_role",
+      "name": "ecs-consul-server-role",
+      "provider": "provider.aws",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:iam::208409385559:role/ecs-consul-server-role",
+            "assume_role_policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"ec2.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}",
+            "create_date": "2024-08-19T11:53:34Z",
+            "description": "",
+            "force_detach_policies": false,
+            "id": "ecs-consul-server-role",
+            "inline_policy": [
+              {
+                "name": "",
+                "policy": ""
+              }
+            ],
+            "managed_policy_arns": [],
+            "max_session_duration": 3600,
+            "name": "ecs-consul-server-role",
+            "name_prefix": null,
+            "path": "/",
+            "permissions_boundary": null,
+            "tags": {},
+            "unique_id": "AROATBBRK3JLUJKVTW4TF"
+          },
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_iam_role",
+      "name": "ecs-ec2-role",
+      "provider": "provider.aws",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:iam::208409385559:role/ecs-ec2-role",
+            "assume_role_policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"ec2.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}",
+            "create_date": "2024-08-19T11:53:34Z",
+            "description": "",
+            "force_detach_policies": false,
+            "id": "ecs-ec2-role",
+            "inline_policy": [
+              {
+                "name": "ecs-ec2-role-policy",
+                "policy": "{\n    \"Version\": \"2012-10-17\",\n    \"Statement\": [\n        {\n            \"Effect\": \"Allow\",\n            \"Action\": [\n              \"ecs:CreateCluster\",\n              \"ecs:DeregisterContainerInstance\",\n              \"ecs:DiscoverPollEndpoint\",\n              \"ecs:Poll\",\n              \"ecs:RegisterContainerInstance\",\n              \"ecs:StartTelemetrySession\",\n              \"ecs:Submit*\",\n              \"ecs:StartTask\",\n              \"ecr:GetAuthorizationToken\",\n              \"ecr:BatchCheckLayerAvailability\",\n              \"ecr:GetDownloadUrlForLayer\",\n              \"ecr:BatchGetImage\",\n              \"logs:CreateLogStream\",\n              \"logs:PutLogEvents\"\n            ],\n            \"Resource\": \"*\"\n        },\n        {\n            \"Effect\": \"Allow\",\n            \"Action\": [\n                \"logs:CreateLogGroup\",\n                \"logs:CreateLogStream\",\n                \"logs:PutLogEvents\",\n                \"logs:DescribeLogStreams\"\n            ],\n            \"Resource\": [\n                \"arn:aws:logs:*:*:*\"\n            ]\n        }\n    ]\n}\n"
+              }
+            ],
+            "managed_policy_arns": [],
+            "max_session_duration": 3600,
+            "name": "ecs-ec2-role",
+            "name_prefix": null,
+            "path": "/",
+            "permissions_boundary": null,
+            "tags": {},
+            "unique_id": "AROATBBRK3JL37HT2DJAY"
+          },
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_iam_role",
+      "name": "ecs-service-role",
+      "provider": "provider.aws",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:iam::208409385559:role/ecs-service-role",
+            "assume_role_policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"ecs.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}",
+            "create_date": "2024-08-19T11:53:34Z",
+            "description": "",
+            "force_detach_policies": false,
+            "id": "ecs-service-role",
+            "inline_policy": [
+              {
+                "name": "",
+                "policy": ""
+              }
+            ],
+            "managed_policy_arns": [
+              "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceRole"
+            ],
+            "max_session_duration": 3600,
+            "name": "ecs-service-role",
+            "name_prefix": null,
+            "path": "/",
+            "permissions_boundary": null,
+            "tags": {},
+            "unique_id": "AROATBBRK3JLXMN2G4B3Q"
+          },
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_iam_role_policy",
+      "name": "ecs-ec2-role-policy",
+      "provider": "provider.aws",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "ecs-ec2-role:ecs-ec2-role-policy",
+            "name": "ecs-ec2-role-policy",
+            "name_prefix": null,
+            "policy": "{\n    \"Version\": \"2012-10-17\",\n    \"Statement\": [\n        {\n            \"Effect\": \"Allow\",\n            \"Action\": [\n              \"ecs:CreateCluster\",\n              \"ecs:DeregisterContainerInstance\",\n              \"ecs:DiscoverPollEndpoint\",\n              \"ecs:Poll\",\n              \"ecs:RegisterContainerInstance\",\n              \"ecs:StartTelemetrySession\",\n              \"ecs:Submit*\",\n              \"ecs:StartTask\",\n              \"ecr:GetAuthorizationToken\",\n              \"ecr:BatchCheckLayerAvailability\",\n              \"ecr:GetDownloadUrlForLayer\",\n              \"ecr:BatchGetImage\",\n              \"logs:CreateLogStream\",\n              \"logs:PutLogEvents\"\n            ],\n            \"Resource\": \"*\"\n        },\n        {\n            \"Effect\": \"Allow\",\n            \"Action\": [\n                \"logs:CreateLogGroup\",\n                \"logs:CreateLogStream\",\n                \"logs:PutLogEvents\",\n                \"logs:DescribeLogStreams\"\n            ],\n            \"Resource\": [\n                \"arn:aws:logs:*:*:*\"\n            ]\n        }\n    ]\n}\n",
+            "role": "ecs-ec2-role"
+          },
+          "private": "bnVsbA==",
+          "depends_on": [
+            "aws_iam_role.ecs-ec2-role"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_instance",
+      "name": "jenkins-instance",
+      "provider": "provider.aws",
+      "instances": []
+    },
+    {
+      "mode": "managed",
+      "type": "aws_key_pair",
+      "name": "mykeypair",
+      "provider": "provider.aws",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "arn": "arn:aws:ec2:eu-central-1:208409385559:key-pair/terraform-20240819114525789900000001",
+            "fingerprint": "06:10:66:b2:37:e3:59:e0:22:c3:70:43:07:5c:80:6c",
+            "id": "terraform-20240819114525789900000001",
+            "key_name": "terraform-20240819114525789900000001",
+            "key_name_prefix": null,
+            "key_pair_id": "key-0617a82d195dce9ad",
+            "public_key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDdR5DtReyIk+uN9wbmrQjc8CfJktm/pwykXLs8VCmB111yqmvJFWWvOn8jFlO9InO8z35jz96nT1uZEWpyHSmE+H+FjZ/5qKz4iRVJzhHX5SuEEM9TyYjHfvGe0fHSr/Ot5IZBIafr1oxYBF86obXT9jaiv11PdRmgczd2ymhDRALhQuQFIRdAES1xDh15F7LFUMsvzRDa7k1lhY1hY7FDrJciG3Nm81ycNOKeAyL2rmtX0lcraIEamX5FID2tltkW0bhDuPwzz/KyhIOTmUfpc/JzGfLM4mSJFYfqfzkkDFJcm79TaCONtV+JFiPNaoSGAsmjM/Q9NP83s5nASitpjgm2IANrUFk8EDlvSgtLhDwcZY+dMTQgXikfJ6MGTcJ3TWLhbdA268r2Zi96k/vULySGpfziHBKttY/H/XWtoZ7ULsjMhWJjQMynXq0/Rnw2URvl+VNeqkvxmP+p30Dxx9yGP1wuHSw7gmnZtgVEC/6dBhz5YPAUj7yWgv7hjWc= natha@Anbunathan",
+            "tags": {}
+          },
+          "private": "eyJzY2hlbWFfdmVyc2lvbiI6IjEifQ=="
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_launch_configuration",
+      "name": "ecs-example-launchconfig",
+      "provider": "provider.aws",
+      "instances": []
+    },
+    {
+      "mode": "managed",
+      "type": "aws_route_table",
+      "name": "main-public",
+      "provider": "provider.aws",
+      "instances": []
+    },
+    {
+      "mode": "managed",
+      "type": "aws_route_table_association",
+      "name": "main-public-1-a",
+      "provider": "provider.aws",
+      "instances": []
+    },
+    {
+      "mode": "managed",
+      "type": "aws_route_table_association",
+      "name": "main-public-2-a",
+      "provider": "provider.aws",
+      "instances": []
+    },
+    {
+      "mode": "managed",
+      "type": "aws_route_table_association",
+      "name": "main-public-3-a",
+      "provider": "provider.aws",
+      "instances": []
+    },
+    {
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "ecs-securitygroup",
+      "provider": "provider.aws",
+      "instances": []
+    },
+    {
+      "mode": "managed",
+      "type": "aws_volume_attachment",
+      "name": "jenkins-data-attachment",
+      "provider": "provider.aws",
+      "instances": []
+    },
+    {
+      "mode": "managed",
+      "type": "aws_vpc",
+      "name": "main",
+      "provider": "provider.aws",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "arn": "arn:aws:ec2:eu-central-1:208409385559:vpc/vpc-0d563fff02b676b47",
+            "assign_generated_ipv6_cidr_block": false,
+            "cidr_block": "10.0.0.0/16",
+            "default_network_acl_id": null,
+            "default_route_table_id": null,
+            "default_security_group_id": null,
+            "dhcp_options_id": "dopt-02ca5f2018a397c1c",
+            "enable_classiclink": null,
+            "enable_classiclink_dns_support": null,
+            "enable_dns_hostnames": true,
+            "enable_dns_support": true,
+            "id": "vpc-0d563fff02b676b47",
+            "instance_tenancy": "default",
+            "ipv6_association_id": "",
+            "ipv6_cidr_block": "",
+            "main_route_table_id": "",
+            "owner_id": "208409385559",
+            "tags": {
+              "Name": "main"
+            },
+            "tags_all": {
+              "Name": "main"
+            }
+          },
+          "private": "eyJzY2hlbWFfdmVyc2lvbiI6IjEifQ=="
+        }
+      ]
+    }
+  ]
+}

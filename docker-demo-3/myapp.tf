@@ -6,6 +6,7 @@ resource "aws_ecs_task_definition" "myapp-task-definition" {
     REPOSITORY_URL = replace(aws_ecr_repository.myapp.repository_url, "https://", "")
     APP_VERSION    = var.MYAPP_VERSION
   })
+  
 }
 
 resource "aws_ecs_service" "myapp-service" {
