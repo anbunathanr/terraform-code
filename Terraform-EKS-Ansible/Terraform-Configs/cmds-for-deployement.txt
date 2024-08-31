@@ -1,0 +1,16 @@
+kubectl apply -f mywebsite-pod.yaml
+kubectl apply -f mywebsite-svc.yaml
+
+2
+kubectl apply -f mario-deployemnt.yaml
+kubectl apply -f mario-svc.yaml
+
+3
+
+kubectl apply -f 2048-pod.yaml
+kubectl apply -f 2048-svc.yaml
+
+
+kubectl describe mywebsite-svc.yaml
+kubectl describe mario-svc.yaml
+kubectl describe 2048-svc.yaml

@@ -1,0 +1,23 @@
+---
+- name: Deploy Kubernetes Resources to EKS Cluster
+  hosts: localhost
+  tasks:    
+    - name: Ensure correct Kubernetes context is set
+      shell: |
+        kubectl config use-context arn:aws:eks:eu-west-1:945912679047:cluster/EKS-Cluster
+      ignore_errors: yes
+
+    - name: Deploy 2048 Game Pod
+      shell: |
+        kubectl apply -f 2048-pod.yaml
+        kubectl apply -f 2048-svc.yaml
+
+    - name: Deploy My Website Service
+      shell: |
+        kubectl apply -f mywebsite-pod.yaml
+        kubectl apply -f mywebsite-svc.yaml
+
+    - name: Deploy Mario Application
+      shell: |
+        kubectl apply -f mario-deployment.yaml
+        kubectl apply -f mario-service.yaml

@@ -1,0 +1,18 @@
+---
+- name: Sample Local Ansible Playbook
+  hosts: localhost
+  connection: local
+  become: yes
+
+  tasks:
+    - name: Create a directory
+      file:
+        path: /tmp/my_directory
+        state: directory
+        mode: '0755'
+
+    - name: Check if the directory exists
+      stat:
+        path: /tmp/my_directory
+      register: directory_info
+
